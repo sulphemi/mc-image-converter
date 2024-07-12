@@ -2,6 +2,7 @@ from PIL import Image;
 from collections import defaultdict;
 import os;
 import math;
+from litemapy import Schematic, Region, BlockState;
 
 
 def blocks_to_rgb() -> dict:
@@ -116,6 +117,14 @@ def main():
     directory = './blocks/';
     big_image = create_image_grid(directory, grid);
     big_image.save('out.png');
+
+    reg = Region(0, 0, 0, width, 1, height);
+
+    for x, y, z in reg.allblockpos():
+        block = BlockState(f"minecraft:{grid[z][x].split(".")[0]}");
+        reg.setblock(x, y, z, block);
+
+    reg.as_schematic().save("out.litematic");
 
 if (__name__ == "__main__"):
     main();
