@@ -26,6 +26,18 @@ def blocks_to_rgb() -> dict:
             if any(pixel[3] != 255 for pixel in pixels):
                 continue;
 
+            # if there is too much variance in the texture we don't use it
+            # makes the already slow code even slower
+            max_diff = 0
+            for i in range(len(pixels)):
+                for j in range(i + 1, len(pixels)):
+                    diff = color_diff(pixels[i][:3], pixels[j][:3])
+                    if diff > max_diff:
+                        max_diff = diff
+
+            if max_diff > 80:
+                continue
+
             # calculate the average rgb of the image as a tuple
             avg_rgb = tuple(sum(x[i] for x in pixels) // len(pixels) for i in range(3));
 
@@ -91,7 +103,6 @@ def main():
 
     for y in range(height):
         for x in range(width):
-            print(x, y);
             pixel = (pixels[x, y])[:3];
             grid[y][x] = find_match(color_map, pixel)[0];
 
