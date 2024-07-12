@@ -26,20 +26,19 @@ def blocks_to_rgb() -> dict:
             if any(pixel[3] != 255 for pixel in pixels):
                 continue;
 
-            # if there is too much variance in the texture we don't use it
-            # makes the already slow code even slower
-            max_diff = 0
-            for i in range(len(pixels)):
-                for j in range(i + 1, len(pixels)):
-                    diff = color_diff(pixels[i][:3], pixels[j][:3])
-                    if diff > max_diff:
-                        max_diff = diff
-
-            if max_diff > 80:
-                continue
-
             # calculate the average rgb of the image as a tuple
             avg_rgb = tuple(sum(x[i] for x in pixels) // len(pixels) for i in range(3));
+
+            # if there is too much variance in the texture we don't use it
+            # you can do this in linear time!!!!!!
+            max_diff = 0
+            for i in range(len(pixels)):
+                diff = color_diff(pixels[i][:3], avg_rgb[:3]);
+                if diff > max_diff:
+                    max_diff = diff;
+
+            if max_diff > 30:
+                continue;
 
             # append the filename to color_map[rgb]
             color_map[avg_rgb].append(filename);
@@ -47,11 +46,18 @@ def blocks_to_rgb() -> dict:
     return color_map;
 
 
+diff_memo = {};
 def color_diff(rgb1: tuple[int], rgb2: tuple[int]) -> int:
     # Return the Euclidean distance between the two colors
-    return int(math.sqrt(sum((a - b) ** 2 for a, b in zip(rgb1, rgb2))));
+    pair = (rgb1, rgb2);
+    if (pair in diff_memo):
+        return diff_memo[pair]
+    ans = int(math.sqrt(sum((a - b) ** 2 for a, b in zip(rgb1, rgb2))));
+    diff_memo[pair] = ans;
+    return ans;
 
 
+# you can do this in log(n) time!!!!!!
 match_memo = {};
 def find_match(color_map: dict, rgb: tuple[int]) -> str:
     # find the one with minimum color distance
