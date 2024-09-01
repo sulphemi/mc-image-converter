@@ -58,7 +58,6 @@ def color_diff(rgb1: tuple[int], rgb2: tuple[int]) -> int:
     return ans;
 
 
-# you can do this in log(n) time!!!!!!
 match_memo = {};
 def find_match(color_map: dict, rgb: tuple[int]) -> str:
     # find the one with minimum color distance
